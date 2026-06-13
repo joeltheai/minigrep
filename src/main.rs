@@ -7,9 +7,7 @@ fn main() {
     let ar: Vec<String> = env::args().collect();
     dbg!(&ar);
 
-    let query = &ar[1];
-    let file_path = &ar[2];
-
+    let (query, file_path) = parse_config(&ar);
     println!("Searching for {query}");
     println!("In file {file_path}");
 
@@ -33,4 +31,11 @@ fn main() {
           //     // Program exits cleanly here instead of crashing with a panic
           // }
     }
+}
+
+fn parse_config(args: &[String]) -> (&str, &str) {
+    let query = &args[1];
+    let file_path = &args[2];
+
+    (query, file_path)
 }
