@@ -7,7 +7,10 @@ fn main() {
     let ar: Vec<String> = env::args().collect();
     dbg!(&ar);
 
-    let config = Config::new(&ar);
+    let config = Config::new(&ar).unwrap_or_else(|err| {
+        println!("Error : {err}");
+        std::process::exit(1);
+    });
     println!("Searching for {}", config.query);
     println!("In file {}", config.file_path);
 
@@ -39,10 +42,13 @@ struct Config {
 }
 
 impl Config {
-    fn new(args: &[String]) -> Config {
+    fn new(args: &[String]) -> Result<Config, &str> {
+        if args.len() < 3 {
+            return Err("Not enough arguments provided");
+        }
         let query = args[1].clone();
         let file_path = args[2].clone();
 
-        Config { query, file_path }
+        Ok(Config { query, file_path })
     }
 }
