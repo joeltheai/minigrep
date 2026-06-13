@@ -44,7 +44,6 @@ fn run(config: Config) {
 
     // println!("With text:\n{contents}");
 
-    // 3. Replaced .expect() with a match statement to handle errors gracefully
     match fs::read_to_string(config.file_path) {
         Ok(contents) => {
             println!("With text:\n{contents}");
