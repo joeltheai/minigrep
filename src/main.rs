@@ -37,15 +37,15 @@ impl Config {
 }
 
 fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Searching for {}", config.query);
+    println!("Searching for : {}", config.query);
 
-    println!("In file {}", config.file_path);
+    println!("In file : {}", config.file_path);
 
     let contents = fs::read_to_string(config.file_path)?;
 
     // println!("\nContents:\n\n{contents}");
 
-    println!("\n\nLines in the file : \n");
+    println!("\n");
     for line in search(&config.query, &contents) {
         println!("{line}");
     }
