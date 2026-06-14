@@ -5,14 +5,17 @@ use std::fs;
 
 fn main() {
     let ar: Vec<String> = env::args().collect();
-    dbg!(&ar);
+    // dbg!(&ar);
 
     let config = Config::new(&ar).unwrap_or_else(|err| {
         println!("Error : {err}");
         std::process::exit(1);
     });
 
-    run(config);
+    if let Err(e) = run(config) {
+        println!("Application error: {e}");
+        std::process::exit(1);
+    }
 }
 
 struct Config {
@@ -32,18 +35,22 @@ impl Config {
     }
 }
 
-fn run(config: Config) {
+fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
     println!("Searching for {}", config.query);
-    println!("In file {}", config.file_path);
 
     println!("In file {}", config.file_path);
 
-    match fs::read_to_string(config.file_path) {
-        Ok(contents) => {
-            println!("With text:\n{contents}");
-        }
-        Err(other_err) => {
-            eprintln!("{}", other_err);
-        }
-    }
+    let contents = fs::read_to_string(config.file_path)?;
+
+    println!("Contents:\n{contents}");
+    Ok(())
+
+    // match fs::read_to_string(config.file_path) {
+    //     Ok(contents) => {
+    //         println!("Contents:\n{contents}");
+    //     }
+    //     Err(other_err) => {
+    //         eprintln!("{}", other_err);
+    //     }
+    // }
 }
