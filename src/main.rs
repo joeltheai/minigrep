@@ -1,3 +1,4 @@
+use minigrep::search;
 use std::env;
 use std::fs;
 
@@ -41,6 +42,10 @@ fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
     println!("In file {}", config.file_path);
 
     let contents = fs::read_to_string(config.file_path)?;
+
+    for line in search(&config.query, &contents) {
+        println!("{line}");
+    }
 
     println!("Contents:\n{contents}");
     Ok(())
