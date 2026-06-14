@@ -1,4 +1,5 @@
 use minigrep::search;
+use minigrep::search_case_insensitive;
 use std::env;
 use std::fs;
 
@@ -22,17 +23,28 @@ fn main() {
 struct Config {
     query: String,
     file_path: String,
+    ignore_case: bool,
 }
 
 impl Config {
     fn new(args: &[String]) -> Result<Config, &str> {
-        if args.len() < 3 {
-            return Err("Not enough arguments provided");
-        }
-        let query = args[1].clone();
-        let file_path = args[2].clone();
+        let (query, file_path, ignore_case) = match args.len() {
+            1..=2 => return Err("Not enough arguments provided"),
+            3 => (args[1].clone(), args[2].clone(), false),
+            4 if args[3] == "-i" || args[3] == "--ignore-case" => {
+                (args[1].clone(), args[2].clone(), true)
+            }
+            _ => {
+                eprintln!("Usage: {} <query> <file> [-i|--ignore-case]", args[0]);
+                return Err("unrecognized flag");
+            }
+        };
 
-        Ok(Config { query, file_path })
+        Ok(Config {
+            query,
+            file_path,
+            ignore_case,
+        })
     }
 }
 
@@ -46,8 +58,14 @@ fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
     // println!("\nContents:\n\n{contents}");
 
     println!("\n");
-    for line in search(&config.query, &contents) {
-        println!("{line}");
+    if !config.ignore_case {
+        for line in search(&config.query, &contents) {
+            println!("{line}");
+        }
+    } else {
+        for line in search_case_insensitive(&config.query, &contents) {
+            println!("{line}");
+        }
     }
 
     Ok(())
