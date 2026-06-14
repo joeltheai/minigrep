@@ -43,11 +43,13 @@ fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
 
     let contents = fs::read_to_string(config.file_path)?;
 
+    // println!("\nContents:\n\n{contents}");
+
+    println!("\n\nLines in the file : \n");
     for line in search(&config.query, &contents) {
         println!("{line}");
     }
 
-    println!("Contents:\n{contents}");
     Ok(())
 
     // match fs::read_to_string(config.file_path) {
