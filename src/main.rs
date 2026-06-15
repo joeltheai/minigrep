@@ -101,14 +101,14 @@ fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
             continue;
         }
 
-        let file_path = entry.path();
+        let file_pathy = entry.path();
     } // println!("\nContents:\n\n{contents}");
 
     let contents = fs::read_to_string(config.file_path)?;
     println!("\n");
     if !config.ignore_case {
-        for line in search(&config.query, &contents) {
-            println!("{line}");
+        for line in search(&contents, &regex, config.invert) {
+            println!("{:?}", line);
         }
     } else {
         for line in search_case_insensitive(&config.query, &contents) {
