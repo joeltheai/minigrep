@@ -1,5 +1,4 @@
 use minigrep::search;
-use minigrep::search_case_insensitive;
 use std::env;
 use std::fs;
 
@@ -26,7 +25,6 @@ fn main() {
 struct Config {
     query: String,
     file_path: String,
-    ignore_case: bool,
     invert: bool,
     count_only: bool,
     files_only: bool,
@@ -36,7 +34,6 @@ impl Config {
     fn new(args: &[String]) -> Result<Config, &str> {
         let query;
         let file_path;
-        let mut ignore_case = false;
 
         let mut invert = false;
         let mut count_only = false;
@@ -50,7 +47,6 @@ impl Config {
                         "-v" => invert = true,
                         "-c" => count_only = true,
                         "-l" => files_only = true,
-                        "-i" => ignore_case = true,
                         _ => {
                             pattern_index = i;
                             break;
@@ -70,7 +66,6 @@ impl Config {
         Ok(Config {
             query,
             file_path,
-            ignore_case,
             invert,
             count_only,
             files_only,
@@ -106,14 +101,8 @@ fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
 
     let contents = fs::read_to_string(config.file_path)?;
     println!("\n");
-    if !config.ignore_case {
-        for line in search(&contents, &regex, config.invert) {
-            println!("{:?}", line);
-        }
-    } else {
-        for line in search_case_insensitive(&contents, &regex, config.invert) {
-            println!("{:?}", line);
-        }
+    for line in search(&contents, &regex, config.invert) {
+        println!("{:?}", line);
     }
 
     Ok(())
