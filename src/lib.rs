@@ -18,16 +18,25 @@ pub fn search(contents: &str, regex: &Regex, invert: bool) -> Vec<(usize, String
     results
 }
 
-pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    let query = query.to_lowercase();
-    let mut results = Vec::new();
+pub fn search_case_insensitive(
+    contents: &str,
+    regex: &Regex,
+    invert: bool,
+) -> Vec<(usize, String)> {
+    let mut results: Vec<(usize, String)> = Vec::new();
+    let mut line_number = 1;
 
     for line in contents.lines() {
-        if line.to_lowercase().contains(&query) {
-            results.push(line);
-        }
-    }
+        let is_match = regex.is_match(line.to_lowercase().as_str());
 
+        let should_include = if invert { !is_match } else { is_match };
+
+        if should_include {
+            results.push((line_number, line.to_string()));
+        }
+
+        line_number += 1;
+    }
     results
 }
 
@@ -54,14 +63,15 @@ Pick three.";
 
     fn case_insensitive() {
         let query = "Duct";
+        let regex = Regex::new(query).unwrap();
         let contents = "\
 Rust:
 safe, fast, productive.
 Pick three.";
 
         assert_eq!(
-            vec!["safe, fast, productive."],
-            search_case_insensitive(query, contents)
+            vec![(2usize, "safe, fast, productive.".into())],
+            search_case_insensitive(contents, &regex, false)
         );
     }
 }

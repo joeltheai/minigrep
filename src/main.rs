@@ -34,8 +34,8 @@ struct Config {
 
 impl Config {
     fn new(args: &[String]) -> Result<Config, &str> {
-        let mut query;
-        let mut file_path;
+        let query;
+        let file_path;
         let mut ignore_case = false;
 
         let mut invert = false;
@@ -111,8 +111,8 @@ fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
             println!("{:?}", line);
         }
     } else {
-        for line in search_case_insensitive(&config.query, &contents) {
-            println!("{line}");
+        for line in search_case_insensitive(&contents, &regex, config.invert) {
+            println!("{:?}", line);
         }
     }
 
