@@ -22,6 +22,7 @@ fn main() {
     }
 }
 
+#[derive(Debug)]
 struct Config {
     query: String,
     file_path: String,
@@ -74,10 +75,6 @@ impl Config {
 }
 
 fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Searching for : {}", config.query);
-
-    println!("In file : {}", config.file_path);
-
     let regex = match Regex::new(&config.query) {
         Ok(r) => r,
         Err(e) => {
@@ -85,6 +82,8 @@ fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
             std::process::exit(1);
         }
     };
+
+    let search_multiple = fs::metadata(&config.file_path)?.is_dir();
 
     for entry in WalkDir::new(&config.file_path).into_iter() {
         let entry = match entry {
@@ -96,23 +95,29 @@ fn run(config: Config) -> Result<(), Box<dyn std::error::Error>> {
             continue;
         }
 
-        let file_pathy = entry.path();
-    } // println!("\nContents:\n\n{contents}");
+        let path = entry.path();
+        let contents = match fs::read_to_string(path) {
+            Ok(c) => c,
+            Err(_) => continue,
+        };
+        let matches = search(&contents, &regex, config.invert);
 
-    let contents = fs::read_to_string(config.file_path)?;
-    println!("\n");
-    for line in search(&contents, &regex, config.invert) {
-        println!("{:?}", line);
+        if config.files_only {
+            if !matches.is_empty() {
+                println!("{}", path.display());
+            }
+        } else if config.count_only {
+            if search_multiple {
+                println!("{}:{}", path.display(), matches.len());
+            } else {
+                println!("{}", matches.len());
+            }
+        } else {
+            for (line_num, line) in matches {
+                println!("{}:{}", line_num, line);
+            }
+        }
     }
 
     Ok(())
-
-    // match fs::read_to_string(config.file_path) {
-    //     Ok(contents) => {
-    //         println!("Contents:\n{contents}");
-    //     }
-    //     Err(other_err) => {
-    //         eprintln!("{}", other_err);
-    //     }
-    // }
 }
