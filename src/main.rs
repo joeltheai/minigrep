@@ -22,6 +22,14 @@ fn main() {
     }
 }
 
+// hello world i love to use rust
+// hello world i love to use rust
+// hello world i love to use rust
+// hello world i love to use rust
+// hello world i love to use rust
+// hello world i love to use rust
+// hello world i love to use rust
+
 #[derive(Debug)]
 struct Config {
     query: String,
